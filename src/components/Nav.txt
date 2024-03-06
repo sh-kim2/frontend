@@ -1,0 +1,55 @@
+<template>
+  <header class="p-3 text-bg-dark">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><router-link to="/" class="nav-link px-2 text-white">Home</router-link></li>
+        </ul>
+
+        <div class="text-end" v-if="auth">
+          <router-link to="/login" class="btn btn-outline-light me-2" @click="logout">Logout</router-link>
+        </div>
+        <div class="text-end" v-if="!auth">
+          <router-link to="/login" class="btn btn-outline-light me-2">Login</router-link>
+          <router-link to="/register" class="btn btn-outline-light me-2">Register</router-link>
+        </div>
+      </div>
+    </div>
+  </header>
+</template>
+
+<script>
+import {computed} from "vue";
+import axios from "axios";
+import {useStore} from "vuex";
+
+export default {
+  name: "Nav",
+  setup() {
+    const store = useStore();
+    const auth = computed(() => store.state.auth);
+    //마운트 해제하세요. 더이상 필요하지 않습니다. onMounted 삭제
+    const logout = async () => {
+      console.log("logout")
+      await axios.post(`logout`, {}, {withCredentials: true});
+      // 우리가 로그아웃할때 아직 수행하지 않은 작업은 다음과 같습니다 우리는 사용해야 해. 그만큼 승인받아야 하고
+      // 새로고침을 제거해야하므로 또한 객세스 토큰과
+      axios.defaults.headers.common[`Authorization`] = '';
+      // 두번째 문제는  토큰발송을 falsu로 설정해야 한다.
+      await store.dispatch(`setAuth`, false);
+    }
+
+    return {
+      auth,
+      logout
+    }
+
+  }
+}
+
+</script>
+
+
+<style scoped>
+
+</style>
